@@ -83,7 +83,7 @@ tiles = []
 for z in range(max + 1) :
     tiles.append(pygame.image.load(str(z) + ".png").convert())
 
-player = [pygame.image.load("left.png").convert(), pygame.image.load("right.png").convert(), 0, 0, 1]
+player = [pygame.image.load("player_left.png").convert(), pygame.image.load("player_right.png").convert(), 0, 0, 1]
 player[0].set_colorkey((0, 0, 0), RLEACCEL)
 player[1].set_colorkey((0, 0, 0), RLEACCEL)
 

@@ -83,9 +83,18 @@ tiles = []
 for z in range(max + 1) :
     tiles.append(pygame.image.load(str(z) + ".png").convert())
 
+'le sprite à gauche | le sprite à droite | position x | position y | la direction (à droite ici)'
 player = [pygame.image.load("player_left.png").convert(), pygame.image.load("player_right.png").convert(), 0, 0, 1]
 player[0].set_colorkey((0, 0, 0), RLEACCEL)
 player[1].set_colorkey((0, 0, 0), RLEACCEL)
+
+enemies = []
+for i in range(3):
+    enemies.append([pygame.image.load("enemy_left.png").convert(), pygame.image.load("enemy_right.png").convert(), 0, 0, 0])
+    enemies[i][0].set_colorkey((0, 0, 0), RLEACCEL)
+    enemies[i][1].set_colorkey((0, 0, 0), RLEACCEL)
+    enemies[i][2] = 335 % 64 * 64
+    enemies[i][3] = int(335 / 64) * 128 - 32
 
 for z in range(len(level)) :
     if level[z] == 2 :
@@ -93,7 +102,13 @@ for z in range(len(level)) :
         player[3] = int(z / 64) * 128 - 32
 
         level[z] = 0
+    if level[z] == 3 :
+        print(' ')
+        print(z)
+        print(z % 64 * 64)
+        print(int(z / 64) * 128 - 32)
 
+'0 gauche | 1 droite | 2 haut | 3 bas'
 keyboard = [False, False, False, False]
 
 clock = pygame.time.Clock()
@@ -123,6 +138,7 @@ while True :
             elif event.key == K_DOWN :
                 keyboard[3] = False
 
+    'après le keyboard[x], système de détection de collision'
     if keyboard[0] and level[int(player[3] / 64) * 32 + int((player[2] - 8) / 64)] == 0 and level[int(player[3] / 64) * 32 + int((player[2] - 8) / 64) + 32] == 0 and (level[int(player[3] / 64) * 32 + int((player[2] - 8) / 64) + 64] == 0 or player[3] % 64 == 0) :
         player[2] -= 8
         player[4] = 0
@@ -143,9 +159,31 @@ while True :
             window.blit(tiles[level[z]], (x * 64 - player[2] % 64, y * 64 - player[3] % 64))
 
     sprite = int(player[2] / 64 + player[3] / 64) % 4
-
     if not keyboard[0] and not keyboard[1] and not keyboard[2] and not keyboard[3] :
         sprite = 0
+
+    for enemy in enemies:
+        if enemy[4] == 0 :
+            enemy[2] += 4
+        elif enemy[4] == 1 :
+            enemy[3] += 4
+        elif enemy[4] == 2 :
+            enemy[2] -= 4
+        elif enemy[4] == 3 :
+            enemy[3] -= 4
+
+        if enemy[2] >= 1408 and enemy[4] == 0 :
+            enemy[4] = 1
+        elif enemy[3] >= 1408 and enemy[4] == 1 :
+            enemy[4] = 2
+        elif enemy[2] <= 640 and enemy[4] == 2 :
+            enemy[4] = 3
+        elif enemy[3] <= 640 and enemy[4] == 3 :
+            enemy[4] = 0
+
+        sprite_enemy = int(enemy[2] / 64 + enemy[3] / 64) % 4
+        window.blit(enemy[0], (enemy[2] - player[2] + 384, enemy[3] - player[3] + 384), (sprite_enemy,0,64,128))
+        'window.blit(enemy[enemy[4]], (17*64 - player[2], 16*64 - player[3]), (0,0,64,128))'
 
     window.blit(player[player[4]], (384, 384), (sprite * 64, 0, 64, 128))
 
